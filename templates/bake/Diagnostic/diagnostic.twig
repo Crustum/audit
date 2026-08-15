@@ -1,0 +1,40 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ namespace }}\Diagnostic;
+
+use Crustum\Audit\Diagnostic;
+use Crustum\Audit\Result\DiagnosticResult;
+use Crustum\Audit\Result\Message;
+
+/**
+ * {{ class }} diagnostic.
+ */
+class {{ class }} extends Diagnostic
+{
+    /**
+     * Get the diagnostic's named message definitions.
+     *
+     * @return array<string, string|\Crustum\Audit\Result\Message>
+     */
+    protected function messages(): array
+    {
+        return [
+            'passed' => 'The check passed.',
+            'failed' => Message::make(
+                'The check failed.',
+                'Describe how to resolve the failure.',
+            ),
+        ];
+    }
+
+    /**
+     * Run the diagnostic.
+     *
+     * @return \Crustum\Audit\Result\DiagnosticResult
+     */
+    public function check(): DiagnosticResult
+    {
+        return $this->pass('passed');
+    }
+}

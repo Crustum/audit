@@ -1,0 +1,57 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ namespace }}\Diagnostic;
+
+use Crustum\Audit\Contract\FixableInterface;
+use Crustum\Audit\Diagnostic;
+use Crustum\Audit\Result\DiagnosticResult;
+use Crustum\Audit\Result\FixResult;
+use Crustum\Audit\Result\Message;
+
+/**
+ * {{ class }} diagnostic.
+ */
+class {{ class }} extends Diagnostic implements FixableInterface
+{
+    /**
+     * Get the diagnostic's named message definitions.
+     *
+     * @return array<string, string|\Crustum\Audit\Result\Message>
+     */
+    protected function messages(): array
+    {
+        return [
+            'passed' => 'The check passed.',
+            'failed' => Message::make(
+                'The check failed.',
+                'Describe how to resolve the failure.',
+                'Apply the fix?',
+            ),
+            'fixed' => 'The failure was fixed.',
+            'fix-failed' => 'The failure could not be fixed.',
+        ];
+    }
+
+    /**
+     * Run the diagnostic.
+     *
+     * @return \Crustum\Audit\Result\DiagnosticResult
+     */
+    public function check(): DiagnosticResult
+    {
+        return $this->fail('failed')->fixable();
+    }
+
+    /**
+     * Fix the diagnostic.
+     *
+     * @param \Crustum\Audit\Result\DiagnosticResult $result Diagnostic result.
+     * @param string|null $option Selected fix option.
+     * @return \Crustum\Audit\Result\FixResult
+     */
+    public function fix(DiagnosticResult $result, ?string $option = null): FixResult
+    {
+        return $this->fixed('fixed');
+    }
+}
