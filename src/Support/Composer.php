@@ -55,7 +55,7 @@ final readonly class Composer
             return [PHP_BINARY, $localComposer];
         }
 
-        $composer = (new ExecutableFinder())->find('composer');
+        $composer = new ExecutableFinder()->find('composer');
 
         if ($composer === null) {
             throw new RuntimeException('Unable to locate the Composer executable.');

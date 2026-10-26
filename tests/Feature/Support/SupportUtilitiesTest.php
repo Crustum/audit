@@ -50,8 +50,8 @@ it('returns null metadata for missing or invalid Composer files', function (): v
     file_put_contents($path, '{');
 
     try {
-        expect((new ComposerJson(TMP . 'missing-composer.json'))->contents())->toBeNull()
-            ->and((new ComposerJson($path))->contents())->toBeNull();
+        expect(new ComposerJson(TMP . 'missing-composer.json')->contents())->toBeNull()
+            ->and(new ComposerJson($path)->contents())->toBeNull();
     } finally {
         unlink($path);
     }

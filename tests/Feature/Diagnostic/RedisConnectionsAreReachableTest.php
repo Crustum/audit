@@ -7,7 +7,7 @@ use Crustum\Audit\Result\Status;
 use Crustum\Audit\Test\Fixtures\Cache\UnreachableRedisCacheEngine;
 
 it('skips redis probes when no redis backends are active', function (): void {
-    expect((new RedisConnectionsAreReachable())->check()->status)->toBe(Status::Skip);
+    expect(new RedisConnectionsAreReachable()->check()->status)->toBe(Status::Skip);
 });
 
 it('fails when an active Redis cache backend cannot be reached', function (): void {
@@ -17,7 +17,7 @@ it('fails when an active Redis cache backend cannot be reached', function (): vo
     ]);
 
     try {
-        $result = (new RedisConnectionsAreReachable())->check();
+        $result = new RedisConnectionsAreReachable()->check();
 
         expect($result->status)->toBe(Status::Fail)
             ->and($result->code)->toBe('redis-connections-are-reachable.unreachable')

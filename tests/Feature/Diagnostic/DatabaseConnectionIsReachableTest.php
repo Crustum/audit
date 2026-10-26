@@ -8,8 +8,8 @@ use Crustum\Audit\Diagnostic\DatabaseConnectionIsReachable;
 use Crustum\Audit\Result\Status;
 
 it('checks the default database connection', function (): void {
-    expect((new DatabaseConnectionIsReachable('test'))->check()->status)->toBe(Status::Pass)
-        ->and((new DatabaseConnectionIsReachable('missing'))->check()->status)->toBe(Status::Skip);
+    expect(new DatabaseConnectionIsReachable('test')->check()->status)->toBe(Status::Pass)
+        ->and(new DatabaseConnectionIsReachable('missing')->check()->status)->toBe(Status::Skip);
 });
 
 it('links to database configuration when the connection cannot be reached', function (): void {
@@ -27,7 +27,7 @@ it('links to database configuration when the connection cannot be reached', func
     ]);
 
     try {
-        $result = (new DatabaseConnectionIsReachable('audit_unreachable'))->check();
+        $result = new DatabaseConnectionIsReachable('audit_unreachable')->check();
 
         expect($result->status)->toBe(Status::Fail)
             ->and($result->code)->toBe('database-connection-is-reachable.unreachable')

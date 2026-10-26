@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use Cake\Core\Container;
+use Cake\Container\Container;
 use Crustum\Audit\AuditManager;
 
 if (!function_exists('auditManager')) {
@@ -19,6 +19,6 @@ if (!function_exists('auditManager')) {
             $container->addShared($diagnostic);
         }
 
-        return (new AuditManager($container))->diagnostics($diagnostics);
+        return new AuditManager($container)->diagnostics($diagnostics);
     }
 }

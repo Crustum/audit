@@ -5,6 +5,7 @@ on:
     branches:
       - 'main'
       - '1.x'
+      - '2.x'
   pull_request:
     branches:
       - '*'
@@ -21,8 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - '8.3'
-          - '8.4'
           - '8.5'
 
     steps:
@@ -58,7 +57,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: dom, mbstring, intl, json
           coverage: none
 
@@ -66,11 +65,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.composer/cache
-          key: ${{ runner.os }}-php-8.4-quality-composer-${{ hashFiles('composer.lock', 'composer.json') }}
-          restore-keys: ${{ runner.os }}-php-8.4-quality-composer-
+          key: ${{ runner.os }}-php-8.5-quality-composer-${{ hashFiles('composer.lock', 'composer.json') }}
+          restore-keys: ${{ runner.os }}-php-8.5-quality-composer-
 
       - name: Composer install
         run: composer install --prefer-dist --no-progress
 
-      - name: Run PHP CodeSniffer
+      - name: Run PHP Checks
         run: composer check

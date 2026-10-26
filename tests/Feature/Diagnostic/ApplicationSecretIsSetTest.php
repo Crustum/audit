@@ -30,7 +30,7 @@ it('does not mark a missing application secret fixable in production', function 
     Configure::write('Audit.environment', 'production');
 
     without_application_secret(function () use ($path): void {
-        $result = (new ApplicationSecretIsSet($path))->check();
+        $result = new ApplicationSecretIsSet($path)->check();
 
         expect($result->status)->toBe(Status::Fail)
             ->and($result->fixableEnvironments)->toBe([EnvironmentMode::Local])
@@ -55,7 +55,7 @@ it('passes when SECURITY_SALT is present in the environment', function (): void 
         putenv('SECURITY_SALT=audit-test-salt-value');
         $_ENV['SECURITY_SALT'] = 'audit-test-salt-value';
 
-        expect((new ApplicationSecretIsSet())->check()->status)->toBe(Status::Pass);
+        expect(new ApplicationSecretIsSet()->check()->status)->toBe(Status::Pass);
     });
 });
 
@@ -63,7 +63,7 @@ it('passes when Security::getSalt is set after Configure::consume', function ():
     without_application_secret(function (): void {
         Security::setSalt('runtime-consumed-salt');
 
-        expect((new ApplicationSecretIsSet())->check()->status)->toBe(Status::Pass);
+        expect(new ApplicationSecretIsSet()->check()->status)->toBe(Status::Pass);
     });
 });
 
@@ -81,7 +81,7 @@ if (!env('APP_NAME') && file_exists(CONFIG . '.env')) {
 PHP);
 
     without_application_secret(function () use ($path): void {
-        $result = (new ApplicationSecretIsSet($path))->check();
+        $result = new ApplicationSecretIsSet($path)->check();
 
         expect($result->status)->toBe(Status::Fail)
             ->and($result->code)->toBe('application-secret-is-set.dotenv-disabled');

@@ -5,9 +5,9 @@ namespace Crustum\Audit;
 
 use Bake\Command\BakeCommand;
 use Cake\Console\CommandCollection;
+use Cake\Container\ContainerInterface;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
-use Cake\Core\ContainerInterface;
 use Cake\Core\Plugin;
 use Cake\Core\PluginApplicationInterface;
 use Cake\Queue\QueueManager;
@@ -53,7 +53,7 @@ class AuditPlugin extends BasePlugin
      *
      * @var string|null
      */
-    protected ?string $name = 'Crustum/Ignis';
+    protected ?string $name = 'Crustum/Audit';
 
     /**
      * @inheritDoc
@@ -114,7 +114,7 @@ class AuditPlugin extends BasePlugin
             }
         }
 
-        $container->addShared(AuditManager::class, fn(): AuditManager => (new AuditManager($container))->diagnostics($diagnostics));
+        $container->addShared(AuditManager::class, fn(): AuditManager => new AuditManager($container)->diagnostics($diagnostics));
         $container->add(AuditCommand::class)->addArgument(AuditManager::class);
     }
 

@@ -20,5 +20,5 @@ it('loads valid configuration files and reports broken files', function (): void
 it('skips configuration loading when no config files are present', function (): void {
     $path = audit_cake_core_path() . DS;
 
-    expect((new ConfigurationFilesCanBeLoaded($path))->check()->status)->toBe(Status::Skip);
+    expect(new ConfigurationFilesCanBeLoaded($path)->check()->status)->toBe(Status::Skip);
 });

@@ -77,8 +77,8 @@ it('passes when there are no migration files', function (): void {
         }
     };
 
-    expect((new MigrationsAreUpToDate($migrations))->check()->status)->toBe(Status::Pass)
-        ->and((new MigrationsAreUpToDate($migrations))->check()->code)
+    expect(new MigrationsAreUpToDate($migrations)->check()->status)->toBe(Status::Pass)
+        ->and(new MigrationsAreUpToDate($migrations)->check()->code)
         ->toBe('migrations-are-up-to-date.no-files');
 });
 
@@ -95,7 +95,7 @@ it('reports migration inspection failures', function (): void {
         }
     };
 
-    expect((new MigrationsAreUpToDate($migrations))->check()->status)->toBe(Status::Fail)
-        ->and((new MigrationsAreUpToDate($migrations))->check()->code)
+    expect(new MigrationsAreUpToDate($migrations)->check()->status)->toBe(Status::Fail)
+        ->and(new MigrationsAreUpToDate($migrations)->check()->code)
         ->toBe('migrations-are-up-to-date.repository-missing');
 });

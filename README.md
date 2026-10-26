@@ -4,7 +4,7 @@ The **Audit** plugin diagnoses common configuration, environment, and infrastruc
 
 ## Requirements
 
-* PHP 8.3+
+* PHP 8.5+
 
 See [Versions.md](docs/Versions.md) for the supported CakePHP versions.
 

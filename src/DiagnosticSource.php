@@ -122,7 +122,7 @@ class DiagnosticSource
     protected static function classFile(string $class): ?string
     {
         try {
-            $file = (new ReflectionClass($class))->getFileName();
+            $file = new ReflectionClass($class)->getFileName();
         } catch (Throwable) {
             return null;
         }

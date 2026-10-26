@@ -5,7 +5,7 @@ namespace Crustum\Audit\Command;
 
 use Cake\Command\Command;
 use Cake\Console\Arguments;
-use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleIoInterface;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Helper;
 use Cake\Core\Configure;
@@ -51,9 +51,9 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Active console IO for the current execution.
      *
-     * @var \Cake\Console\ConsoleIo|null
+     * @var \Cake\Console\ConsoleIoInterface|null
      */
-    protected ?ConsoleIo $consoleIo = null;
+    protected ?ConsoleIoInterface $consoleIo = null;
 
     /**
      * Constructor.
@@ -126,8 +126,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * @inheritDoc
      */
     #[Override]
-    public function execute(Arguments $args, ConsoleIo $io): ?int
+    public function execute(): ?int
     {
+        $args = $this->args;
+        $io = $this->io;
         $this->consoleIo = $io;
         $this->bindGracefulTermination(function (): void {
             $this->consoleIo?->err('Audit interrupted.');
@@ -175,10 +177,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Get the requested output format.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return 'cli'|'json'|'github'|'agent'|null
      */
-    protected function format(Arguments $args, ConsoleIo $io): ?string
+    protected function format(Arguments $args, ConsoleIoInterface $io): ?string
     {
         $format = $args->getOption('format');
 
@@ -199,10 +201,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Get the configured exit-code threshold.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return 'fail'|'warn'|'never'|null
      */
-    protected function failOn(Arguments $args, ConsoleIo $io): ?string
+    protected function failOn(Arguments $args, ConsoleIoInterface $io): ?string
     {
         $failOn = $args->getOption('fail-on');
 
@@ -219,11 +221,11 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Determine whether the fix option is valid for the format.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param 'cli'|'json'|'github'|'agent' $format Output format.
      * @return bool
      */
-    protected function fixOptionIsValidFor(Arguments $args, ConsoleIo $io, string $format): bool
+    protected function fixOptionIsValidFor(Arguments $args, ConsoleIoInterface $io, string $format): bool
     {
         if ($format === 'cli' || $format === 'agent' || !$args->getOption('fix')) {
             return true;
@@ -238,11 +240,11 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Run Audit for CLI output.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param 'fail'|'warn'|'never' $failOn Exit threshold.
      * @return int
      */
-    protected function runCli(Arguments $args, ConsoleIo $io, string $failOn): int
+    protected function runCli(Arguments $args, ConsoleIoInterface $io, string $failOn): int
     {
         $runner = $this->runner($args);
 
@@ -280,11 +282,11 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Run Audit for JSON output.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param 'fail'|'warn'|'never' $failOn Exit threshold.
      * @return int
      */
-    protected function runJson(Arguments $args, ConsoleIo $io, string $failOn): int
+    protected function runJson(Arguments $args, ConsoleIoInterface $io, string $failOn): int
     {
         $report = $this->runner($args)->run();
         $io->out(json_encode($report, JSON_THROW_ON_ERROR));
@@ -296,15 +298,15 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Run Audit for GitHub Actions output.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param 'fail'|'warn'|'never' $failOn Exit threshold.
      * @return int
      */
-    protected function runGithub(Arguments $args, ConsoleIo $io, string $failOn): int
+    protected function runGithub(Arguments $args, ConsoleIoInterface $io, string $failOn): int
     {
         $report = $this->runner($args)->run();
 
-        foreach ((new GithubRenderer())->annotations($report) as $annotation) {
+        foreach (new GithubRenderer()->annotations($report) as $annotation) {
             $io->out($annotation);
         }
 
@@ -315,11 +317,11 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Run Audit for agent-optimized output.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param 'fail'|'warn'|'never' $failOn Exit threshold.
      * @return int
      */
-    protected function runAgent(Arguments $args, ConsoleIo $io, string $failOn): int
+    protected function runAgent(Arguments $args, ConsoleIoInterface $io, string $failOn): int
     {
         $runner = $this->runner($args);
 
@@ -330,7 +332,7 @@ class AuditCommand extends Command implements SignalableCommandInterface
         }
 
         $report = $runner->run();
-        $io->out((new AgentRenderer())->render($report));
+        $io->out(new AgentRenderer()->render($report));
 
         return $this->exitCode($report, $failOn);
     }
@@ -383,10 +385,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Get the callback that observes each diagnostic group as a console task.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return \Closure(string, \Closure): void
      */
-    protected function taskObserver(ConsoleIo $io): Closure
+    protected function taskObserver(ConsoleIoInterface $io): Closure
     {
         return function (string $group, Closure $next) use ($io): void {
             $this->taskHelper($io)->run([
@@ -454,11 +456,11 @@ class AuditCommand extends Command implements SignalableCommandInterface
      * Decide whether a fix should be applied and with which option.
      *
      * @param \Cake\Console\Arguments $args CLI arguments.
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param \Crustum\Audit\Result\DiagnosticOutcome $outcome Diagnostic outcome.
      * @return string|bool
      */
-    protected function fixDecision(Arguments $args, ConsoleIo $io, DiagnosticOutcome $outcome): bool|string
+    protected function fixDecision(Arguments $args, ConsoleIoInterface $io, DiagnosticOutcome $outcome): bool|string
     {
         if ($outcome->fixRequiresOption()) {
             return $this->chooseFix($io, $args, $outcome);
@@ -483,12 +485,12 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Let the user choose between the fix options or decline the fix.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param \Cake\Console\Arguments $args CLI arguments.
      * @param \Crustum\Audit\Result\DiagnosticOutcome $outcome Diagnostic outcome.
      * @return string|bool
      */
-    protected function chooseFix(ConsoleIo $io, Arguments $args, DiagnosticOutcome $outcome): bool|string
+    protected function chooseFix(ConsoleIoInterface $io, Arguments $args, DiagnosticOutcome $outcome): bool|string
     {
         if ($args->getOption('quiet') || $args->getOption('fix')) {
             return false;
@@ -524,10 +526,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Get the interactive CLI renderer.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return \Crustum\Audit\Renderer\CliRenderer
      */
-    protected function renderer(ConsoleIo $io): CliRenderer
+    protected function renderer(ConsoleIoInterface $io): CliRenderer
     {
         return $this->renderer ??= new CliRenderer($io);
     }
@@ -557,11 +559,11 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Load a Crustum Prompts console helper.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @param string $name Helper short name.
      * @return \Cake\Console\Helper
      */
-    protected function helper(ConsoleIo $io, string $name): Helper
+    protected function helper(ConsoleIoInterface $io, string $name): Helper
     {
         return $io->helper('Crustum/Prompts.' . $name);
     }
@@ -569,10 +571,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Resolve the Confirm helper.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return \Crustum\Prompts\Console\Helper\ConfirmHelper
      */
-    protected function confirmHelper(ConsoleIo $io): ConfirmHelper
+    protected function confirmHelper(ConsoleIoInterface $io): ConfirmHelper
     {
         $helper = $this->helper($io, 'Confirm');
         if (!$helper instanceof ConfirmHelper) {
@@ -585,10 +587,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Resolve the Select helper.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return \Crustum\Prompts\Console\Helper\SelectHelper
      */
-    protected function selectHelper(ConsoleIo $io): SelectHelper
+    protected function selectHelper(ConsoleIoInterface $io): SelectHelper
     {
         $helper = $this->helper($io, 'Select');
         if (!$helper instanceof SelectHelper) {
@@ -601,10 +603,10 @@ class AuditCommand extends Command implements SignalableCommandInterface
     /**
      * Resolve the Task helper.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      * @return \Crustum\Prompts\Console\Helper\TaskHelper
      */
-    protected function taskHelper(ConsoleIo $io): TaskHelper
+    protected function taskHelper(ConsoleIoInterface $io): TaskHelper
     {
         $helper = $this->helper($io, 'Task');
         if (!$helper instanceof TaskHelper) {

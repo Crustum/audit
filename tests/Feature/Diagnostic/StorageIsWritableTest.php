@@ -29,5 +29,5 @@ it('passes when CakePHP runtime directories are already writable', function (): 
         mkdir($dir, 0775, true);
     }
 
-    expect((new StorageIsWritable($paths))->check()->status)->toBe(Status::Pass);
+    expect(new StorageIsWritable($paths)->check()->status)->toBe(Status::Pass);
 });

@@ -4,8 +4,8 @@ declare(strict_types=1);
 use Cake\Console\Arguments;
 use Cake\Console\CommandInterface;
 use Cake\Console\ConsoleIo;
+use Cake\Container\Container;
 use Cake\Core\Configure;
-use Cake\Core\Container;
 use Crustum\Audit\AuditManager;
 use Crustum\Audit\AuditPlugin;
 use Crustum\Audit\Command\AuditCommand;
@@ -78,7 +78,7 @@ it('rejects invalid fail-on values before running diagnostics', function (): voi
         'fix' => false,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_ERROR);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_ERROR);
 });
 
 it('rejects fixes with json output', function (): void {
@@ -98,7 +98,7 @@ it('rejects fixes with json output', function (): void {
         'fix' => true,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_ERROR);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_ERROR);
 });
 
 it('renders diagnostic links in json output', function (): void {
@@ -119,7 +119,7 @@ it('renders diagnostic links in json output', function (): void {
         'fix' => false,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_SUCCESS);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_SUCCESS);
 
     $payload = json_decode($buffer, true, flags: JSON_THROW_ON_ERROR);
     expect($payload['diagnostics'][0]['links'])->toBe([
@@ -145,7 +145,7 @@ it('renders github annotations', function (): void {
         'fix' => false,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_SUCCESS)
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_SUCCESS)
         ->and(implode("\n", $lines))
         ->toContain('title=Testing diagnostic has links')
         ->toContain('https://example.com/cache');
@@ -169,7 +169,7 @@ it('renders agent output', function (): void {
         'fix' => false,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_SUCCESS);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_SUCCESS);
 
     $payload = json_decode(trim($buffer), true, flags: JSON_THROW_ON_ERROR);
     expect($payload)->toMatchArray([
@@ -202,7 +202,7 @@ it('bails after the first failure from the command', function (): void {
         'fix' => false,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_ERROR);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_ERROR);
 
     $payload = json_decode($buffer, true, flags: JSON_THROW_ON_ERROR);
     expect(array_column($payload['diagnostics'], 'class'))->toBe([
@@ -217,7 +217,7 @@ it('applies configured only selectors', function (): void {
     $container->addShared(PassingDiagnostic::class);
     $container->addShared(WarningDiagnostic::class);
 
-    $manager = (new AuditManager($container))->diagnostics([
+    $manager = new AuditManager($container)->diagnostics([
         PassingDiagnostic::class,
         WarningDiagnostic::class,
     ]);
@@ -238,7 +238,7 @@ it('applies configured only selectors', function (): void {
         'fix' => false,
     ], []);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_SUCCESS);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_SUCCESS);
 
     $payload = json_decode($buffer, true, flags: JSON_THROW_ON_ERROR);
     expect($payload['diagnostics'])->toHaveCount(1)
@@ -261,7 +261,7 @@ it('restores a valid timezone before termination', function (): void {
         'fix' => false,
     ], []);
 
-    $command->execute($args, $io);
+    executeCommand($command, $args, $io);
 
     expect(Configure::read('App.defaultTimezone'))->toBe(date_default_timezone_get());
 });

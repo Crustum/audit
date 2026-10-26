@@ -30,9 +30,9 @@ it('requires a diagnostic name', function (): void {
     $io->expects($this->once())->method('out');
 
     $args = $this->createMock(Arguments::class);
-    $args->method('getArgumentAt')->with(0)->willReturn(null);
+    $args->expects($this->once())->method('getArgumentAt')->with(0)->willReturn(null);
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_ERROR);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_ERROR);
 });
 
 it('generates a standard diagnostic class', function (): void {
@@ -42,9 +42,11 @@ it('generates a standard diagnostic class', function (): void {
     $io = $this->createMock(ConsoleIo::class);
     $args = $this->createMock(Arguments::class);
     $args->method('getOption')->willReturn(null);
+    $command->setArgs($args);
+    $command->setIo($io);
 
     try {
-        $content = $command->getContent('HorizonIsRunning', $args, $io, false);
+        $content = $command->getContent('HorizonIsRunning', false);
     } catch (MissingTemplateException $missingTemplateException) {
         $this->markTestSkipped('Template not available: ' . $missingTemplateException->getMessage());
     }
@@ -64,9 +66,11 @@ it('generates a fixable diagnostic class', function (): void {
     $io = $this->createMock(ConsoleIo::class);
     $args = $this->createMock(Arguments::class);
     $args->method('getOption')->willReturn(null);
+    $command->setArgs($args);
+    $command->setIo($io);
 
     try {
-        $content = $command->getContent('HorizonIsRunning', $args, $io, true);
+        $content = $command->getContent('HorizonIsRunning', true);
     } catch (MissingTemplateException $missingTemplateException) {
         $this->markTestSkipped('Template not available: ' . $missingTemplateException->getMessage());
     }
@@ -95,7 +99,7 @@ it('generates a diagnostic that runs', function (): void {
     });
 
     $args = $this->createMock(Arguments::class);
-    $args->method('getArgumentAt')->with(0)->willReturn('GeneratedStandardDiagnostic');
+    $args->expects($this->once())->method('getArgumentAt')->with(0)->willReturn('GeneratedStandardDiagnostic');
     $args->method('getOption')->willReturnCallback(fn(string $key): ?bool => match ($key) {
         'fixable' => false,
         'force' => true,
@@ -103,7 +107,7 @@ it('generates a diagnostic that runs', function (): void {
         default => null,
     });
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_SUCCESS);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_SUCCESS);
 
     $path = APP . 'Diagnostic' . DS . 'GeneratedStandardDiagnostic.php';
     expect(is_file($path))->toBeTrue();
@@ -132,7 +136,7 @@ it('generates a fixable diagnostic that runs and fixes', function (): void {
     });
 
     $args = $this->createMock(Arguments::class);
-    $args->method('getArgumentAt')->with(0)->willReturn('GeneratedFixableDiagnostic');
+    $args->expects($this->once())->method('getArgumentAt')->with(0)->willReturn('GeneratedFixableDiagnostic');
     $args->method('getOption')->willReturnCallback(fn(string $key): ?bool => match ($key) {
         'fixable' => true,
         'force' => true,
@@ -140,7 +144,7 @@ it('generates a fixable diagnostic that runs and fixes', function (): void {
         default => null,
     });
 
-    expect($command->execute($args, $io))->toBe(CommandInterface::CODE_SUCCESS);
+    expect(executeCommand($command, $args, $io))->toBe(CommandInterface::CODE_SUCCESS);
 
     $path = APP . 'Diagnostic' . DS . 'GeneratedFixableDiagnostic.php';
     require_once $path;

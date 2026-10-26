@@ -36,7 +36,7 @@ it('preserves an absolute Windows sqlite database path', function (string $datab
     ]);
 
     try {
-        $result = (new SqliteDatabaseExists('audit_sqlite_windows'))->check();
+        $result = new SqliteDatabaseExists('audit_sqlite_windows')->check();
 
         expect($result->status)->toBe(Status::Fail)
             ->and($result->context['database'])
@@ -60,7 +60,7 @@ it('passes when the SQLite database file already exists', function (): void {
     ]);
 
     try {
-        expect((new SqliteDatabaseExists('audit_sqlite_exists', $path))->check()->status)->toBe(Status::Pass);
+        expect(new SqliteDatabaseExists('audit_sqlite_exists', $path)->check()->status)->toBe(Status::Pass);
     } finally {
         ConnectionManager::drop('audit_sqlite_exists');
     }
@@ -82,11 +82,11 @@ it('skips SQLite checks for non-sqlite and memory databases', function (): void 
     ]);
 
     try {
-        expect((new SqliteDatabaseExists('audit_sqlite_memory'))->check()->status)->toBe(Status::Skip)
-            ->and((new SqliteDatabaseExists('audit_sqlite_memory'))->check()->code)
+        expect(new SqliteDatabaseExists('audit_sqlite_memory')->check()->status)->toBe(Status::Skip)
+            ->and(new SqliteDatabaseExists('audit_sqlite_memory')->check()->code)
             ->toBe('sqlite-database-exists.not-file')
-            ->and((new SqliteDatabaseExists('audit_not_sqlite'))->check()->status)->toBe(Status::Skip)
-            ->and((new SqliteDatabaseExists('audit_not_sqlite'))->check()->code)
+            ->and(new SqliteDatabaseExists('audit_not_sqlite')->check()->status)->toBe(Status::Skip)
+            ->and(new SqliteDatabaseExists('audit_not_sqlite')->check()->code)
             ->toBe('sqlite-database-exists.not-sqlite');
     } finally {
         ConnectionManager::drop('audit_sqlite_memory');

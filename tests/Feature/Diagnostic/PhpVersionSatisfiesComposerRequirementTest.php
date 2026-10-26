@@ -11,7 +11,7 @@ it('reports when the PHP version does not satisfy Composer', function (): void {
         'require' => ['php' => '<1.0'],
     ], JSON_THROW_ON_ERROR));
 
-    expect((new PhpVersionSatisfiesComposerRequirement(new ComposerJson($path)))->check()->status)
+    expect(new PhpVersionSatisfiesComposerRequirement(new ComposerJson($path))->check()->status)
         ->toBe(Status::Fail);
 });
 
@@ -21,6 +21,6 @@ it('passes when the PHP version satisfies Composer', function (): void {
         'require' => ['php' => '>=7.0'],
     ], JSON_THROW_ON_ERROR));
 
-    expect((new PhpVersionSatisfiesComposerRequirement(new ComposerJson($path)))->check()->status)
+    expect(new PhpVersionSatisfiesComposerRequirement(new ComposerJson($path))->check()->status)
         ->toBe(Status::Pass);
 });

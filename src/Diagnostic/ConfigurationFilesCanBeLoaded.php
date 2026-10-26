@@ -25,7 +25,7 @@ final class ConfigurationFilesCanBeLoaded extends Diagnostic
      *
      * @var list<string>
      */
-    private const SKIP_FILES = [
+    private const array SKIP_FILES = [
         'bootstrap.php',
         'bootstrap_cli.php',
         'cli.php',

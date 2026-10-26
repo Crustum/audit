@@ -36,7 +36,7 @@ it('reports Composer lock constraint mismatches', function (): void {
     $fixture = audit_composer_fixture(
         'fwrite(STDERR, "Required package \"vendor/package\" is not present in the lock file."); exit(1);',
     );
-    $result = (new ComposerLockIsFresh($fixture['composer'], $fixture['path']))->check();
+    $result = new ComposerLockIsFresh($fixture['composer'], $fixture['path'])->check();
 
     expect($result->status)->toBe(Status::Fail)
         ->and($result->code)->toBe('composer-lock-is-fresh.constraint-mismatch')
@@ -47,7 +47,7 @@ it('does not report unrelated Composer validation errors as stale lock files', f
     $fixture = audit_composer_fixture(
         'fwrite(STDERR, "Invalid composer.json schema"); exit(1);',
     );
-    $result = (new ComposerLockIsFresh($fixture['composer'], $fixture['path']))->check();
+    $result = new ComposerLockIsFresh($fixture['composer'], $fixture['path'])->check();
 
     expect($result->status)->toBe(Status::Fail)
         ->and($result->code)->toBe('composer-lock-is-fresh.inspection-failed');

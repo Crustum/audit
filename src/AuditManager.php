@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Crustum\Audit;
 
+use Cake\Container\ContainerInterface;
 use Cake\Core\Configure;
-use Cake\Core\ContainerInterface;
 use Closure;
 use Crustum\Audit\Contract\FixableInterface;
 use Crustum\Audit\Result\DiagnosticFixOutcome;
@@ -31,7 +31,7 @@ class AuditManager
     /**
      * Constructor.
      *
-     * @param \Cake\Core\ContainerInterface $container Application container.
+     * @param \Cake\Container\ContainerInterface $container Application container.
      */
     public function __construct(protected ContainerInterface $container)
     {
@@ -296,13 +296,6 @@ class AuditManager
 
         foreach ($this->diagnostics as $class) {
             $diagnostic = $this->container->get($class);
-
-            if (!$diagnostic instanceof Diagnostic) {
-                throw new LogicException(sprintf(
-                    'Container entry [%s] must be a diagnostic.',
-                    $class,
-                ));
-            }
 
             if (!$selection instanceof DiagnosticSelection || $selection->matches($diagnostic)) {
                 $diagnostics[] = $diagnostic;

@@ -11,7 +11,7 @@ it('warns about missing recommended PHP extensions from Composer', function (): 
         'suggest' => ['ext-audit_missing_suggested' => 'Optional'],
     ], JSON_THROW_ON_ERROR));
 
-    expect((new RecommendedPhpExtensionsAreLoaded(new ComposerJson($path)))->check()->status)
+    expect(new RecommendedPhpExtensionsAreLoaded(new ComposerJson($path))->check()->status)
         ->toBe(Status::Warn);
 });
 
@@ -21,6 +21,6 @@ it('passes when recommended PHP extensions are loaded', function (): void {
         'suggest' => ['ext-json' => 'Already loaded'],
     ], JSON_THROW_ON_ERROR));
 
-    expect((new RecommendedPhpExtensionsAreLoaded(new ComposerJson($path)))->check()->status)
+    expect(new RecommendedPhpExtensionsAreLoaded(new ComposerJson($path))->check()->status)
         ->toBe(Status::Pass);
 });

@@ -5,8 +5,7 @@ namespace Crustum\Audit\Command;
 
 use Bake\Command\BakeCommand;
 use Bake\Utility\TemplateRenderer;
-use Cake\Console\Arguments;
-use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleIoInterface;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Override;
@@ -32,12 +31,12 @@ class DiagnosticCommand extends BakeCommand
     /**
      * Execute the command.
      *
-     * @param \Cake\Console\Arguments $args The command arguments.
-     * @param \Cake\Console\ConsoleIo $io The console io
      * @return int|null The exit code or null for success
      */
-    public function execute(Arguments $args, ConsoleIo $io): ?int
+    public function execute(): ?int
     {
+        $args = $this->args;
+        $io = $this->io;
         $name = $args->getArgumentAt(0);
 
         if (empty($name)) {
@@ -47,9 +46,9 @@ class DiagnosticCommand extends BakeCommand
             return static::CODE_ERROR;
         }
 
-        $name = $this->_getName($name);
+        $name = $this->getNameWithoutPrefix($name);
         $fixable = $args->getOption('fixable') === true;
-        $content = $this->getContent($name, $args, $io, $fixable);
+        $content = $this->getContent($name, $fixable);
 
         if (empty($content)) {
             $io->err("<warning>No generated content for '{$name}', not generating template.</warning>");
@@ -57,7 +56,7 @@ class DiagnosticCommand extends BakeCommand
             return static::CODE_ERROR;
         }
 
-        $this->bake($name, $args, $io, $content);
+        $this->bake($name, $content);
 
         return static::CODE_SUCCESS;
     }
@@ -66,45 +65,41 @@ class DiagnosticCommand extends BakeCommand
      * Write the generated diagnostic class.
      *
      * @param string $name Diagnostic class name
-     * @param \Cake\Console\Arguments $args CLI arguments
-     * @param \Cake\Console\ConsoleIo $io Console io
      * @param string|true $content Content to write.
      * @return void
      */
-    public function bake(string $name, Arguments $args, ConsoleIo $io, string|bool $content): void
+    public function bake(string $name, string|bool $content): void
     {
-        $path = $this->getPath($args);
+        $path = $this->getPath();
         $filename = $path . $name . '.php';
-        $io->out("\n" . sprintf('Baking diagnostic class for %s...', $name), 1, ConsoleIo::QUIET);
+        $this->io->out("\n" . sprintf('Baking diagnostic class for %s...', $name), 1, ConsoleIoInterface::QUIET);
 
-        if (is_string($content) && $args->getOption('verbose')) {
-            $io->out($content);
+        if (is_string($content) && $this->args->getOption('verbose')) {
+            $this->io->out($content);
         }
 
         if (is_string($content)) {
-            $forceOption = $args->getOption('force');
+            $forceOption = $this->args->getOption('force');
             $force = is_bool($forceOption) && $forceOption;
-            $io->createFile($filename, $content, $force);
+            $this->io->createFile($filename, $content, $force);
         }
 
         $emptyFile = $path . '.gitkeep';
-        $this->deleteEmptyFile($emptyFile, $io);
+        $this->deleteEmptyFile($emptyFile);
     }
 
     /**
      * Get content for the diagnostic class.
      *
      * @param string $name Diagnostic class name
-     * @param \Cake\Console\Arguments $args CLI arguments
-     * @param \Cake\Console\ConsoleIo $io Console io
      * @param bool $fixable Whether to generate a fixable diagnostic.
      * @return string|bool Generated content
      */
-    public function getContent(string $name, Arguments $args, ConsoleIo $io, bool $fixable = false): string|bool
+    public function getContent(string $name, bool $fixable = false): string|bool
     {
         $namespace = Configure::read('App.namespace');
         if ($this->plugin) {
-            $namespace = $this->_pluginNamespace($this->plugin);
+            $namespace = $this->pluginNamespace($this->plugin);
         }
 
         $vars = [
@@ -113,7 +108,7 @@ class DiagnosticCommand extends BakeCommand
             'fixable' => $fixable,
         ];
 
-        $themeOption = $args->getOption('theme');
+        $themeOption = $this->args->getOption('theme');
         $theme = is_string($themeOption) ? $themeOption : null;
         $renderer = new TemplateRenderer($theme);
         $renderer->set('plugin', $this->plugin);
@@ -129,18 +124,17 @@ class DiagnosticCommand extends BakeCommand
     /**
      * Gets the path for output.
      *
-     * @param \Cake\Console\Arguments $args Arguments instance to read the prefix option from.
      * @return string Path to output.
      */
     #[Override]
-    public function getPath(Arguments $args): string
+    public function getPath(): string
     {
         $path = APP . $this->pathFragment;
         if ($this->plugin) {
-            $path = $this->_pluginPath($this->plugin) . 'src/' . $this->pathFragment;
+            $path = $this->pluginPath($this->plugin) . 'src/' . $this->pathFragment;
         }
 
-        $prefix = $this->getPrefix($args);
+        $prefix = $this->getPrefix();
         if ($prefix !== '' && $prefix !== '0') {
             $path .= $prefix . DIRECTORY_SEPARATOR;
         }
@@ -157,7 +151,7 @@ class DiagnosticCommand extends BakeCommand
     #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
-        $parser = $this->_setCommonOptions($parser);
+        $parser = $this->setCommonOptions($parser);
         $parser->setDescription(self::getDescription())
             ->addArgument('name', [
                 'help' => 'Name of the diagnostic class to generate (e.g., HorizonIsRunning).',

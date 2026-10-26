@@ -25,7 +25,7 @@ it('passes when an environment file already exists', function (): void {
     $path = audit_environment_path();
     file_put_contents($path . DS . '.env', "DEBUG=false\n");
 
-    expect((new EnvironmentFileExists($path))->check()->status)->toBe(Status::Pass);
+    expect(new EnvironmentFileExists($path)->check()->status)->toBe(Status::Pass);
 });
 
 it('creates an empty environment file when the example is missing', function (): void {
@@ -53,7 +53,7 @@ it('does not overwrite an existing environment file when fixed', function (): vo
 it('does not offer to create a missing environment file in production', function (): void {
     $path = audit_environment_path();
     Configure::write('Audit.environment', 'production');
-    $result = (new EnvironmentFileExists($path))->check();
+    $result = new EnvironmentFileExists($path)->check();
 
     expect($result->status)->toBe(Status::Fail)
         ->and($result->fixableEnvironments)->toBe([EnvironmentMode::Local])

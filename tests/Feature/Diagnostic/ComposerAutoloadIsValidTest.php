@@ -20,7 +20,7 @@ it('checks and regenerates Composer autoload files', function (): void {
 it('passes when Composer autoload dry-run succeeds', function (): void {
     $fixture = audit_composer_fixture('exit(0);');
 
-    expect((new ComposerAutoloadIsValid($fixture['composer'], $fixture['path']))->check()->status)
+    expect(new ComposerAutoloadIsValid($fixture['composer'], $fixture['path'])->check()->status)
         ->toBe(Status::Pass);
 });
 
@@ -32,7 +32,7 @@ it('skips Composer autoload when dependencies are missing', function (): void {
     file_put_contents($executable, "<?php\nexit(0);");
     $composer = new Composer([PHP_BINARY, $executable], $path);
 
-    expect((new ComposerAutoloadIsValid($composer, $path))->check()->status)->toBe(Status::Skip)
-        ->and((new ComposerAutoloadIsValid($composer, $path))->check()->code)
+    expect(new ComposerAutoloadIsValid($composer, $path)->check()->status)->toBe(Status::Skip)
+        ->and(new ComposerAutoloadIsValid($composer, $path)->check()->code)
         ->toBe('composer-autoload-is-valid.dependencies-missing');
 });

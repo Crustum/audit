@@ -11,7 +11,7 @@ it('reports missing required PHP extensions from Composer', function (): void {
         'require' => ['ext-audit_missing_required' => '*'],
     ], JSON_THROW_ON_ERROR));
 
-    expect((new RequiredPhpExtensionsAreLoaded(new ComposerJson($path)))->check()->status)
+    expect(new RequiredPhpExtensionsAreLoaded(new ComposerJson($path))->check()->status)
         ->toBe(Status::Fail);
 });
 
@@ -21,6 +21,6 @@ it('passes when required PHP extensions are loaded', function (): void {
         'require' => ['ext-json' => '*'],
     ], JSON_THROW_ON_ERROR));
 
-    expect((new RequiredPhpExtensionsAreLoaded(new ComposerJson($path)))->check()->status)
+    expect(new RequiredPhpExtensionsAreLoaded(new ComposerJson($path))->check()->status)
         ->toBe(Status::Pass);
 });

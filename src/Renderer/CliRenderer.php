@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Crustum\Audit\Renderer;
 
-use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleIoInterface;
 use Cake\Console\Helper;
 use Crustum\Audit\Result\DiagnosticFixOutcome;
 use Crustum\Audit\Result\DiagnosticOutcome;
@@ -19,9 +19,9 @@ class CliRenderer
     /**
      * Constructor.
      *
-     * @param \Cake\Console\ConsoleIo $io Console IO.
+     * @param \Cake\Console\ConsoleIoInterface $io Console IO.
      */
-    public function __construct(protected ConsoleIo $io)
+    public function __construct(protected ConsoleIoInterface $io)
     {
     }
 
@@ -35,7 +35,7 @@ class CliRenderer
     {
         $this->helper('Intro')->output(['message' => 'Results']);
 
-        $verbose = $this->io->level() >= ConsoleIo::VERBOSE;
+        $verbose = $this->io->level() >= ConsoleIoInterface::VERBOSE;
         $notices = [];
         $failedFixes = $this->failedFixesByDiagnostic($report->fixes());
         $mergedFixes = [];

@@ -16,9 +16,9 @@ beforeEach(function (): void {
 it('probes configured queue transports', function (): void {
     QueueManager::setConfig('default', ['url' => 'null:']);
 
-    expect((new QueueConnectionIsReachable())->check()->status)->toBe(Status::Pass);
+    expect(new QueueConnectionIsReachable()->check()->status)->toBe(Status::Pass);
 });
 
 it('skips queue reachability when the connection is not configured', function (): void {
-    expect((new QueueConnectionIsReachable('missing-queue'))->check()->status)->toBe(Status::Skip);
+    expect(new QueueConnectionIsReachable('missing-queue')->check()->status)->toBe(Status::Skip);
 });

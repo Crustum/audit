@@ -5,7 +5,7 @@ use Crustum\Audit\Diagnostic\ScheduledTasksRequireScheduler;
 use Crustum\Audit\Result\Status;
 
 it('notices registered scheduled tasks and skips when scheduling is unavailable', function (): void {
-    expect((new ScheduledTasksRequireScheduler())->check()->status)->toBe(Status::Skip);
+    expect(new ScheduledTasksRequireScheduler()->check()->status)->toBe(Status::Skip);
 
     $schedule = new class {
         /**
@@ -17,7 +17,7 @@ it('notices registered scheduled tasks and skips when scheduling is unavailable'
         }
     };
 
-    expect((new ScheduledTasksRequireScheduler($schedule))->check()->status)->toBe(Status::Notice);
+    expect(new ScheduledTasksRequireScheduler($schedule)->check()->status)->toBe(Status::Notice);
 });
 
 it('passes scheduling when no events are registered', function (): void {
@@ -31,5 +31,5 @@ it('passes scheduling when no events are registered', function (): void {
         }
     };
 
-    expect((new ScheduledTasksRequireScheduler($schedule))->check()->status)->toBe(Status::Pass);
+    expect(new ScheduledTasksRequireScheduler($schedule)->check()->status)->toBe(Status::Pass);
 });

@@ -26,21 +26,21 @@ it('passes when debug mode is disabled in production', function (): void {
     Configure::write('Audit.environment', 'production');
     Configure::write('debug', false);
 
-    expect((new DebugModeMatchesEnvironment())->check()->status)->toBe(Status::Pass);
+    expect(new DebugModeMatchesEnvironment()->check()->status)->toBe(Status::Pass);
 });
 
 it('allows debug mode in local environments', function (): void {
     Configure::write('Audit.environment', 'local');
     Configure::write('debug', true);
 
-    expect((new DebugModeMatchesEnvironment())->check()->status)->toBe(Status::Pass);
+    expect(new DebugModeMatchesEnvironment()->check()->status)->toBe(Status::Pass);
 });
 
 it('treats unmapped environments as production for debug mode', function (): void {
     Configure::write('Audit.environment', 'staging');
     Configure::write('debug', true);
 
-    expect((new DebugModeMatchesEnvironment())->check()->status)->toBe(Status::Fail);
+    expect(new DebugModeMatchesEnvironment()->check()->status)->toBe(Status::Fail);
 });
 
 it('honors custom local environment mappings for debug mode', function (): void {
@@ -51,7 +51,7 @@ it('honors custom local environment mappings for debug mode', function (): void 
     Configure::write('Audit.environment', 'development');
     Configure::write('debug', true);
 
-    expect((new DebugModeMatchesEnvironment())->check()->status)->toBe(Status::Pass);
+    expect(new DebugModeMatchesEnvironment()->check()->status)->toBe(Status::Pass);
 });
 
 it('adds DEBUG when it is missing from the environment file', function (): void {

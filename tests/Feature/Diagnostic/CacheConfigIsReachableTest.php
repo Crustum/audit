@@ -11,15 +11,15 @@ it('passes when the configured cache configs can be reached', function (): void 
     Cache::setConfig('audit_probe', ['className' => 'File', 'path' => $cachePath]);
 
     try {
-        expect((new CacheConfigIsReachable('audit_probe'))->check()->status)->toBe(Status::Pass)
-            ->and((new CacheConfigIsReachable())->check()->status)->toBe(Status::Pass);
+        expect(new CacheConfigIsReachable('audit_probe')->check()->status)->toBe(Status::Pass)
+            ->and(new CacheConfigIsReachable()->check()->status)->toBe(Status::Pass);
     } finally {
         Cache::drop('audit_probe');
     }
 });
 
 it('skips cache probes when none of the requested configs exist', function (): void {
-    $result = (new CacheConfigIsReachable('audit_missing_cache'))->check();
+    $result = new CacheConfigIsReachable('audit_missing_cache')->check();
 
     expect($result->status)->toBe(Status::Skip)
         ->and($result->code)->toBe('cache-config-is-reachable.not-configured');
@@ -32,7 +32,7 @@ it('fails when a cache configuration cannot be reached', function (): void {
     ]);
 
     try {
-        $result = (new CacheConfigIsReachable('audit_broken_cache'))->check();
+        $result = new CacheConfigIsReachable('audit_broken_cache')->check();
 
         expect($result->status)->toBe(Status::Fail)
             ->and($result->code)->toBe('cache-config-is-reachable.unreachable');

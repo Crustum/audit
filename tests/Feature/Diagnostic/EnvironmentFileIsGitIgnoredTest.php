@@ -25,7 +25,7 @@ it('accepts config/.env gitignore patterns', function (): void {
     $path = audit_environment_path();
     file_put_contents($path . DS . '.gitignore', "/config/.env\n");
 
-    expect((new EnvironmentFileIsGitIgnored($path))->check()->status)->toBe(Status::Pass);
+    expect(new EnvironmentFileIsGitIgnored($path)->check()->status)->toBe(Status::Pass);
 });
 
 it('creates a gitignore that ignores environment files when missing', function (): void {
@@ -43,7 +43,7 @@ it('does not offer to update gitignore in production', function (): void {
     $path = audit_environment_path();
     file_put_contents($path . DS . '.gitignore', "/vendor\n");
     Configure::write('Audit.environment', 'production');
-    $result = (new EnvironmentFileIsGitIgnored($path))->check();
+    $result = new EnvironmentFileIsGitIgnored($path)->check();
 
     expect($result->status)->toBe(Status::Fail)
         ->and($result->fixableEnvironments)->toBe([EnvironmentMode::Local])

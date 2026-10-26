@@ -51,7 +51,7 @@ if (!function_exists('without_application_secret')) {
         unset($_ENV['SECURITY_SALT'], $_SERVER['SECURITY_SALT']);
         Configure::delete('Security.salt');
 
-        $reflection = new ReflectionProperty(Security::class, '_salt');
+        $reflection = new ReflectionProperty(Security::class, 'salt');
         $original = $reflection->getValue();
         $reflection->setValue(null, null);
 
