@@ -38,8 +38,6 @@ use Crustum\Audit\Diagnostic\SqliteDatabaseExists;
 use Crustum\Audit\Diagnostic\StorageIsWritable;
 use Crustum\Audit\Support\Composer;
 use Crustum\Audit\Support\ComposerJson;
-use Crustum\PluginManifest\Manifest\ManifestInterface;
-use Crustum\PluginManifest\Manifest\ManifestTrait;
 use Crustum\Prompts\PromptsPlugin;
 use Migrations\Migrations;
 use Override;
@@ -47,13 +45,9 @@ use SignalHandler\SignalHandlerPlugin;
 
 /**
  * Plugin for Crustum/Audit
- *
- * @uses \Crustum\PluginManifest\Manifest\ManifestTrait
  */
-class AuditPlugin extends BasePlugin implements ManifestInterface
+class AuditPlugin extends BasePlugin
 {
-    use ManifestTrait;
-
     /**
      * Plugin name.
      *
@@ -183,26 +177,5 @@ class AuditPlugin extends BasePlugin implements ManifestInterface
         }
 
         return $diagnostics;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function manifest(): array
-    {
-        $pluginPath = dirname(__DIR__);
-
-        return array_merge(
-            static::manifestConfig(
-                $pluginPath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'audit.php',
-                CONFIG . 'audit.php',
-                false,
-            ),
-            static::manifestBootstrapAppend(
-                "if (file_exists(CONFIG . 'audit.php')) {\n    Configure::load('audit', 'default');\n}",
-                '// Audit Plugin Configuration',
-            ),
-            static::manifestStarRepo('Crustum/Audit'),
-        );
     }
 }

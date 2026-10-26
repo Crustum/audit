@@ -17,7 +17,6 @@
     "require": {
         "php": ">=8.3",
         "cakephp/cakephp": "^5.4",
-        "crustum/plugin-manifest": "^1.0",
         "crustum/prompts": "^1.2",
         "laravel/agent-detector": "^2.0.2",
         "skie/signal_handler": "^1.0",
@@ -26,21 +25,23 @@
         "composer/semver": "^3.4"
     },
     "require-dev": {
+        "boundwize/structarmed": "0.14",
         "cakedc/cakephp-phpstan": "^4.3",
-        "pestphp/pest": "^4.1",
-        "phpunit/phpunit": "^10.5 || ^11.1 || ^12.5",
-        "cakephp/cakephp-codesniffer": "^5.0",
-        "phpstan/phpstan": "^2.2.2",
-        "rector/rector": "^2.5",
+        "cakephp/bake": "^3.0",
+        "cakephp/cakephp-codesniffer": "^5.3",
         "cakephp/migrations": "^5.2",
         "cakephp/queue": "^2.3",
-        "cakephp/bake": "^3.0",
-        "boundwize/structarmed": "0.14"
+        "crustum/plugin-manifest": "^1.2",
+        "pestphp/pest": "^4.1",
+        "phpunit/phpunit": "^10.5 || ^11.1 || ^12.5 || ^13.0",
+        "phpstan/phpstan": "^2.3",
+        "rector/rector": "^2.7"
     },
     "suggest": {
         "cakephp/migrations": "Enables pending-migration diagnostics.",
         "cakephp/queue": "Enables queue connection and asynchronous-mode diagnostics.",
         "crustum/cakephp-scheduling": "Enables scheduled-task registration diagnostics.",
+        "crustum/plugin-manifest": "CakePHP plugin installer",
         "ext-redis": "Enables diagnostics for Redis-backed cache and queue configurations."
     },
     "autoload": {
